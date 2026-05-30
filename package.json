@@ -6,15 +6,20 @@
   "bin": {
     "neo-to-ynab": "convert.js"
   },
+  "type": "module",
   "scripts": {
     "start": "node convert.js",
     "format": "oxfmt .",
     "format:check": "oxfmt --check ."
   },
+  "dependencies": {
+    "@clack/prompts": "^1.5.0",
+    "picocolors": "^1.1.1"
+  },
   "devDependencies": {
     "oxfmt": "^0.52.0"
   },
   "engines": {
-    "node": ">=14"
+    "node": ">=20.12"
   }
 }

@@ -1,7 +1,10 @@
 # neo-to-ynab
 
-A tiny, dependency-free Node CLI that converts a **Neo Financial** CSV export into a
-**YNAB** (You Need A Budget) file-based import.
+A small Node CLI that converts a **Neo Financial** CSV export into a **YNAB**
+(You Need A Budget) file-based import. It has a scriptable headless mode and a
+colorful interactive wizard.
+
+![neo-to-ynab interactive wizard converting a Neo Financial CSV into a YNAB import](screenshot.png)
 
 ## Why
 
@@ -23,9 +26,24 @@ positive), so amounts pass straight through.
 
 ## Requirements
 
-Node.js 14 or newer. No `npm install` needed — it uses only built-in modules.
+Node.js 20.12 or newer. Install dependencies once:
+
+```bash
+npm install
+```
 
 ## Usage
+
+### Interactive (recommended)
+
+Run it with no arguments in a terminal and it walks you through everything —
+paste the path to your CSV, then answer a few prompts:
+
+```bash
+node convert.js
+```
+
+### Headless (scriptable)
 
 ```bash
 node convert.js <input.csv> [options]
@@ -39,6 +57,7 @@ pass `-o`.
 | Option                | Description                                                   |
 | --------------------- | ------------------------------------------------------------- |
 | `-o, --output <path>` | Output file path (default: `<input>_YNAB.csv`)                |
+| `-i, --interactive`   | Force the interactive wizard                                  |
 | `--skip-pending`      | Exclude `Pending` transactions                                |
 | `--keep-pending`      | Include `Pending` transactions **(default)**                  |
 | `--skip-declined`     | Exclude `Declined` transactions **(default)**                 |
@@ -69,11 +88,19 @@ node convert.js ~/Downloads/EverydaySpending.csv --posted-only
 node convert.js ~/Downloads/EverydaySpending.csv --skip-pending -o ~/Desktop/ynab.csv
 ```
 
-Sample output:
+Sample output (colorized in a real terminal):
 
 ```
-Wrote 509 transaction(s) -> /Users/you/Downloads/EverydaySpending_YNAB.csv
-  skipped 26 Declined
+neo-to-ynab · Neo Financial → YNAB
+
+  ✓ Converted 509 of 535 transactions
+  – Dropped 26 Declined
+
+  source  ~/Downloads/EverydaySpending_2026-01-01_2026-05-30.csv
+  output  ~/Downloads/EverydaySpending_2026-01-01_2026-05-30_YNAB.csv
+
+  Amounts pass through unchanged — Neo already signs outflows negative.
+  Next: open the account in YNAB → Edit → Import → pick this file.
 ```
 
 ## Importing into YNAB
@@ -104,7 +131,15 @@ Code is formatted with [oxfmt](https://oxc.rs/docs/guide/usage/formatter) using
 its defaults (no config file).
 
 ```bash
-npm install         # one-time, installs the oxfmt dev dependency
 npm run format        # format in place
 npm run format:check  # verify formatting without writing (CI-friendly)
 ```
+
+## Project layout
+
+- `core.js` — pure conversion logic (CSV parse/serialize + status filtering), no I/O or UI.
+- `convert.js` — the CLI: argument parsing, the headless run, and the interactive wizard.
+
+Runtime dependencies: [`@clack/prompts`](https://www.npmjs.com/package/@clack/prompts)
+for the interactive prompts and [`picocolors`](https://www.npmjs.com/package/picocolors)
+for colored output.
